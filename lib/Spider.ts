@@ -35,10 +35,6 @@ export class Spider {
 
     this._site.addWaitingList(this._url.href, 0)
 
-    page.on('console', (msg) => {
-      console.log('msg: ' + msg.text())
-    })
-
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const nextWaitingUrl = this._site.searchWaitingLink()

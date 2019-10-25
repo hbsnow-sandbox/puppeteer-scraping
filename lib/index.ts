@@ -5,7 +5,7 @@ import { Spider, SpiderOptionInterface } from './Spider'
 const argv = yargs.options({
   h: { type: 'string', alias: 'href' },
   d: { type: 'number', alias: 'depth' },
-  o: { type: 'string', alias: 'output' },
+  o: { type: 'string', alias: 'outputDir' },
 }).argv
 
 const init = async () => {
@@ -19,7 +19,8 @@ const init = async () => {
   }
 
   const url = new URL(argv.h)
-  const spider = new Spider(url, new Site(), options)
+  const site = new Site()
+  const spider = new Spider(url, site, options)
 
   if (url.username && url.password) {
     spider.auth = {
