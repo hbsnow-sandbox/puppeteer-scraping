@@ -1,0 +1,19 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./lib",
+    "target": "es2018",
+    "module": "commonjs",
+    "strict": true,
+    "baseUrl": "lib",
+    "declaration": true,
+    "paths": {
+      "*": ["types/*"]
+    },
+    "lib": ["dom", "dom.iterable", "es2018"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": ["lib/**/*"],
+  "exclude": [".git", "node_modules"]
+}
