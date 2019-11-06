@@ -15,7 +15,7 @@ const init = async () => {
 
   const options: SpiderOptionInterface = {
     depth: argv.d || null,
-    outputDir: argv.o || 'output'
+    outputDir: argv.o || 'output',
   }
 
   const url = new URL(argv.h)
@@ -25,7 +25,7 @@ const init = async () => {
   if (url.username && url.password) {
     spider.auth = {
       username: url.username,
-      password: url.password
+      password: url.password,
     }
   }
 

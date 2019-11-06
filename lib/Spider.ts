@@ -15,7 +15,11 @@ export interface BasicAuthInterface {
 export class Spider {
   private _auth: BasicAuthInterface | null = null
 
-  constructor(private _url: URL, private _site: Site, private _options: SpiderOptionInterface) {}
+  constructor(
+    private _url: URL,
+    private _site: Site,
+    private _options: SpiderOptionInterface
+  ) {}
 
   set auth(auth: BasicAuthInterface | null) {
     this._auth = auth
@@ -27,13 +31,16 @@ export class Spider {
     return this._auth
   }
 
+  /**
+   * スクレイピングを実行する
+   */
   async start() {
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
     })
     const page = await browser.newPage()
 
-    this._site.addWaitingList(this._url.href, 0)
+    this._site.addList(this._url.href, 0)
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -52,6 +59,11 @@ export class Spider {
     await browser.close()
   }
 
+  /**
+   * リンクがもつリストから未登録状態のリンクを追加する
+   * @param page
+   * @param link
+   */
   async nextScraping(page: puppeteer.Page, link: LinkInterface) {
     const links = await this.searchHrefFromPage(page, link)
     this._site.replaceLinks(link.href, links)
@@ -60,11 +72,19 @@ export class Spider {
     if (this._options.depth && depth >= this._options.depth) return
 
     links.forEach((link) => {
-      this._site.addWaitingList(link.href, depth)
+      this._site.addList(link.href, depth)
     })
   }
 
-  async searchHrefFromPage(page: puppeteer.Page, link: LinkInterface): Promise<URL[]> {
+  /**
+   * puppeteerでページを開いてリンク先が同一ホストのリンクを取得
+   * @param page
+   * @param link
+   */
+  async searchHrefFromPage(
+    page: puppeteer.Page,
+    link: LinkInterface
+  ): Promise<URL[]> {
     const url = new URL(link.href)
     if (this._auth) {
       url.username = this._auth.username
