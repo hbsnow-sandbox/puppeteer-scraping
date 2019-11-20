@@ -22,13 +22,6 @@ const init = async () => {
   const site = new Site()
   const spider = new Spider(url, site, options)
 
-  if (url.username && url.password) {
-    spider.auth = {
-      username: url.username,
-      password: url.password,
-    }
-  }
-
   spider.start()
 }
 
