@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import puppeteer, { AuthOptions } from 'puppeteer'
 import { Site, LinkInterface } from './Site'
 import { writeLinks } from './file'
 
@@ -7,38 +7,39 @@ export interface SpiderOptionInterface {
   outputDir: string
 }
 
-export interface BasicAuthInterface {
-  username: string
-  password: string
-}
-
 export class Spider {
-  private _auth: BasicAuthInterface | null = null
+  private _auth: AuthOptions | null = null
 
   constructor(
     private _url: URL,
     private _site: Site,
     private _options: SpiderOptionInterface
-  ) {}
-
-  set auth(auth: BasicAuthInterface | null) {
-    this._auth = auth
-  }
-
-  get auth(): BasicAuthInterface | null {
-    if (!this._auth) return null
-
-    return this._auth
+  ) {
+    if (_url.username && _url.password) {
+      this._auth = {
+        username: _url.username,
+        password: _url.password,
+      }
+      _url.username = ''
+      _url.password = ''
+    }
   }
 
   /**
    * スクレイピングを実行する
    */
   async start() {
-    const browser = await puppeteer.launch({
-      ignoreHTTPSErrors: true,
-    })
+    let launchOptions = {}
+    if (process.env.NODE_ENV === 'debug') {
+      launchOptions = {
+        ...launchOptions,
+        slowMo: 300,
+        headless: false,
+      }
+    }
+    const browser = await puppeteer.launch(launchOptions)
     const page = await browser.newPage()
+    await page.authenticate(this._auth)
 
     this._site.addList(this._url.href, 0)
 
@@ -86,12 +87,11 @@ export class Spider {
     link: LinkInterface
   ): Promise<URL[]> {
     const url = new URL(link.href)
-    if (this._auth) {
-      url.username = this._auth.username
-      url.password = this._auth.password
-    }
 
-    await page.goto(url.href)
+    console.log(`Crawling: ${url.href}`)
+    await page.goto(url.href, {
+      waitUntil: ['domcontentloaded', 'networkidle2'],
+    })
 
     const urls = await page.evaluate(() => {
       const $hrefs = document.querySelectorAll('a')
