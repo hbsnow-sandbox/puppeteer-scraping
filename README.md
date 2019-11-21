@@ -11,5 +11,5 @@ yarn install
 ## Usage
 
 ```js
-yarn start -h http://example.com
+yarn start -h http://usename:password@example.com
 ```
